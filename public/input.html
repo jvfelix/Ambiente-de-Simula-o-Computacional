@@ -1,0 +1,98 @@
+{% extends 'basic.html' %}
+
+{% block content %}
+
+<h1>Coeficientes do sistema dinâmico</h1>
+<form action="add" method="POST">
+    {% csrf_token %}
+
+    numerador: <input type="text" name="num1"><br><br>
+    denominador: <input type="text" name="num2"><br><br>
+    
+
+    <h1>Coeficientes do Controlador PID</h1>
+    numerador: <input type="text" name="numpid"><br><br>
+    denominador: <input type="text" name="denpid"><br><br>
+    <input type="submit">
+    
+</form>
+
+<form action = "entDeg"  method="POST">
+    <label class="switch">
+        Degrau:<input type="checkbox">
+        <span class="slider round"></span>
+      </label>
+</form>
+<font size = "5">{{num_tf}}</font><br><br>
+<font size = "5">{{linha_tf}}</font><br><br>
+<font size = "5">{{den_tf}}</font><br><br>
+
+
+
+<h1>Subtraction</h1>
+<form action="sub" method="POST">
+    {% csrf_token %}
+
+    Enter first number: <input type="text" name="num1"><br><br>
+    Enter second number: <input type="text" name="num2"><br><br>
+    <input type="submit">
+</form>
+
+<h1>Multiplication</h1>
+<form action="multi" method="POST">
+    {% csrf_token %}
+
+    Enter first number: <input type="text" name="num1"><br><br>
+    Enter second number: <input type="text" name="num2"><br><br>
+    <input type="submit">
+</form>
+
+<h1>Division</h1>
+<form action="div" method="POST">
+    {% csrf_token %}
+
+    Enter first number: <input type="text" name="num1"><br><br>
+    Enter second number: <input type="text" name="num2"><br><br>
+    <input type="submit">
+</form>
+
+
+<canvas id="myChart" width="200" height="200"></canvas>
+<script>
+var ctx = document.getElementById('myChart').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {{lista}},
+        datasets: [{
+            label: '# of Votes',
+            data: {{labels}},
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
