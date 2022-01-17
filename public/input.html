@@ -3,69 +3,81 @@
 {% block content %}
 
 
-<form action="add" method="POST">
+<form action="result" method="POST">
     {% csrf_token %}
-    <h1>Entrada</h1>
-    Amplitude: <input type="text" name="ampdg"><br><br>
+    
 
-    <h1>Coeficientes do sistema dinâmico</h1>
-    numerador: <input type="text" name="num1"><br><br>
-    denominador: <input type="text" name="num2"><br><br>
+    <div class="mt-5">
+        <div class="row">
+            <h2 class="w-100 text-center">Sistema</h2>
+        </div>
 
-    <h1>Coeficientes do Compensador (Atraso, Avanço e Atraso e Avanço)</h1>
-    numerador: <input type="text" name="numcomp"><br><br>
-    denominador: <input type="text" name="dencomp"><br><br>
-    <input type="submit">
+        <div class="form-group row">
+            <label for="ampdg">Amplitude: </label>
+            <input type="text" class="form-control" id="ampdg" name="ampdg"><br><br>
+        </div>
+    </div>
+    
+    <div class="mt-5">
+        <div class="row">
+            <h2 class="w-100 text-center" >Coeficientes do sistema dinâmico</h2>
+        </div>
 
-    <h1>Coeficientes do Controlador PID</h1>
-    Ganho Proporcional: <input type="text" name="kp"><br><br>
-    Ganho Integral: <input type="text" name="ki"><br><br>
-    Ganho Derivativo: <input type="text" name="kd"><br><br>
-    <input type="submit">
+        <div class="form-group row">
+            <label for="num1">Numerador </label>
+            <input type="text" class="form-control" name="num1" id="num1"><br><br>
+        </div>
+        
+        <div class="form-group row">
+            <label for="num2">Denominador</label>
+            <input type="text" class="form-control" name="num2" id="num2"><br><br>
+        </div>
+    </div>
+
+
+
+
+    <div class="mt-5">
+        <div class="row">
+            <h2 class="w-100 text-center">Coeficientes do Compensador (Atraso, Avanço e Atraso e Avanço)</h2>
+        </div>
+
+        <div class="form-group row">
+            <label for="numcomp"> Numerador </label>
+            <input id="numcomp" class="form-control" type="text" name="numcomp">
+        </div>
+
+        <div class="form-group row">
+            <label for="dencomp"> Denominador </label>
+            <input id="dencomp" class="form-control" type="text" name="dencomp">
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <div class="row">
+            <h2 class="w-100 text-center" >Coeficientes do Controlador PID</h2>
+        </div>
+        
+        <div class="form-group row">
+            <label for="kp">Ganho Proporcional</label>
+            <input id="kp" class="form-control" type="text" name="kp">
+        </div>
+
+        <div class="form-group row">
+            <label class="col-form-label" for="ki">Ganho Integral</label>
+            <input id="ki" class="form-control" type="text" name="ki">
+        </div>
+        
+        <div class="form-group row">
+            <label class="col-form-label" for="kd">Ganho Derivativo</label>
+            <input id="kd" class="form-control" type="text" name="kd">
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <input class="btn btn-primary" type="submit">
+    </div>
     
 </form>
 
-
-
-
-
-
-<canvas id="myChart" width="100" height="100"></canvas>
-<script>
-var ctx = document.getElementById('myChart').getContext('2d');
-var myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: {{lista}},
-        datasets: [{
-            label: '# of Votes',
-            data: {{labels}},
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});
-</script>
-{% endblock %}
+{%endblock%}

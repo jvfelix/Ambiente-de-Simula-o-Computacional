@@ -1,15 +1,55 @@
 
 from django.shortcuts import render
+import matplotlib, io, base64, urllib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import numpy as np
 import control as co
-# Create your views here.
 
 def index(request):
     return render(request, "input.html")
 
+def get_pzmap(G):    
+    plt.clf()
+    plt.figure(figsize=(7, 7), dpi=100)
+    co.pzmap(G, True, True)
+    fig = plt.gcf()
+    buf = io.BytesIO()
+    fig.savefig(buf, format = 'png')
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    url = urllib.parse.quote(string)
+    return url
 
-def addition(request):
-    labels = ['azul','verde','vermelho']
-    lista = [1,2,3]
+def get_step_response(G, subtitle=''):
+    plt.clf()
+    plt.figure(figsize=(7, 7), dpi=100)
+    X, Y = co.step_response(G)
+    plt.plot(X, Y, label = subtitle)
+    plt.grid()
+    plt.legend()
+    # plt.xticks(np.arange(0,X[-1] + .001,X[-1]/10))
+    fig = plt.gcf()
+    buf = io.BytesIO()
+    fig.savefig(buf, format = 'png')
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    url = urllib.parse.quote(string)
+    return url
+
+def get_lgr(G, subtitle=''):
+    plt.clf()
+    plt.figure(figsize=(7, 7), dpi=100)
+    co.root_locus(G, plot = True)
+    fig = plt.gcf()
+    buf = io.BytesIO()
+    fig.savefig(buf, format = 'png')
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    url = urllib.parse.quote(string)
+    return url
+
+def result(request):
     kinho = True
     degrau = request.POST['ampdg']
     num1 = request.POST['num1']
@@ -147,14 +187,23 @@ def addition(request):
         #a = int(num1)
         #b = int(num2)
         res = co.tf(num,den)
+        res = co.feedback(res,1,1)
         Gpid = ampdegrau*res*comp
         G = co.feedback(Gpid,1,-1)
-        lista,labels = co.step_response(G)
-        return render(request, "input.html", {"num_tf": texto, "linha_tf": linha,"den_tf": texto2 ,"labels":list(labels),"lista":list(lista)})
+        return render(request, "result.html", 
+                {
+                    'step_response':get_step_response(res),
+                    'step_response_comp':get_step_response(G),
+                    'lgr':get_lgr(res),
+                    'lgr_comp':get_lgr(G),
+                    'pzmap':get_pzmap(res),
+                    'pzmap_comp':get_pzmap(G),
+                    'System':res.__str__(),
+                    'SystemComp':G.__str__(),
+                    'Comp':comp.__str__(),
+                })
         
-    
 
-    
 
 def subtraction(request):
 
@@ -208,6 +257,3 @@ def division(request):
     else:
         res = "Only digits are allowed"
         return render(request, "result.html", {"result": res})
-
-def degrau(request):
-    print("kinho")
