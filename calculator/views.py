@@ -1,27 +1,30 @@
 
+from .forms import SystemForm, CompensatorForm, PIDForm
 from django.shortcuts import render
 import matplotlib, io, base64, urllib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import numpy as np
 import control as co
 
 def index(request):
     if request.method == 'POST':
-        data = request.POST
-        return render(request, "input.html", result(data))
+        system = SystemForm(request.POST)
+        compensator = CompensatorForm(request.POST)
+        pid = PIDForm(request.POST)
+        return render(request, "input.html", result(system, compensator, pid))
+
     else:
         data = {}
         data['exemplo'] = True
         data['ampdg'] = '1'
-        data['num1'] = '1'
-        data['num2'] = '1 2'
+        data['num'] = '1'
+        data['den'] = '1 2'
         data['numcomp'] = '1'
         data['dencomp'] = '1 0'
         data['kp'] = ''
         data['ki'] = ''
         data['kd'] = ''
-        return render(request, "input.html", result(data))
+        return render(request, "input.html", result(SystemForm(data), CompensatorForm(data), PIDForm(data), True))
 
 def get_pzmap(G):    
     plt.clf()
@@ -42,7 +45,6 @@ def get_step_response(G, subtitle=''):
     plt.plot(X, Y, label = subtitle)
     plt.grid()
     plt.legend()
-    # plt.xticks(np.arange(0,X[-1] + .001,X[-1]/10))
     fig = plt.gcf()
     buf = io.BytesIO()
     fig.savefig(buf, format = 'png')
@@ -63,45 +65,35 @@ def get_lgr(G, subtitle=''):
     url = urllib.parse.quote(string)
     return url
 
-def result(data):
-    exemplo = False
-    try:
-        exemplo = data['exemplo'] 
-    except:
-        pass
+def result(system, compensator, pid, exemplo = False):
+    
+    if system.is_valid():
+        system_data = system.cleaned_data
+        ampdegrau = system_data['ampdg']
+        num = system_data['num']
+        den = system_data['den']
 
-    degrau = data['ampdg']
-    num1 = data['num1']
-    num2 = data['num2']
-    numcomp = data['numcomp']
-    dencomp = data['dencomp']
-    kp = data['kp']
-    ki = data['ki']
-    kd = data['kd']
-    
-    if kp.isdigit():
-        kp = float(kp)
-    else:
-        kp = 0
-    
-    if ki.isdigit():
-        ki = float(ki)
+    if compensator.is_valid():
+        compensator_data = compensator.cleaned_data
+        numcomp = compensator_data['numcomp']
+        dencomp = compensator_data['dencomp']
+
+    if pid.is_valid():
+        pid_data = pid.cleaned_data
+        kp = pid_data['kp']
+        ki = pid_data['ki']
+        kd = pid_data['kd']
     else:
         ki = 0
-    
-    if kd.isdigit():
-        kd = float(kd)
-    else:
+        kp = 0
         kd = 0
     
-    ampdegrau = float(degrau)
-    
-    conv_num = num1.split()
+    conv_num = num.split()
     num = []
     for casa in conv_num:
         num.append(float(casa))
     #convertendo denominador
-    conv_den = num2.split()
+    conv_den = den.split()
     den = []
     for casa in conv_den:
         den.append(float(casa))
@@ -203,7 +195,9 @@ def result(data):
         comp = gp + gi + gd
     
     res = co.tf(num,den)
+    print(res)
     res = co.feedback(res,1,1)
+    print(res)
     Gpid = ampdegrau*res*comp
     G = co.feedback(Gpid,1,-1)
 
@@ -218,18 +212,21 @@ def result(data):
                 'System':res.__str__(),
                 'SystemComp':G.__str__(),
                 'Comp':comp.__str__(),
+                'system':system,
+                'compensator':compensator,
+                'pid':pid
             }
         
 
 
 def subtraction(request):
 
-    num1 = request.POST['num1']
-    num2 = request.POST['num2']
+    num = request.POST['num']
+    den = request.POST['den']
 
-    if num1.isdigit() and num2.isdigit():
-        a = int(num1)
-        b = int(num2)
+    if num.isdigit() and den.isdigit():
+        a = int(num)
+        b = int(den)
         res = a - b
 
         return render(request, "result.html", {"result": res})
@@ -240,12 +237,12 @@ def subtraction(request):
 
 def multiplication(request):
 
-    num1 = request.POST['num1']
-    num2 = request.POST['num2']
+    num = request.POST['num']
+    den = request.POST['den']
 
-    if num1.isdigit() and num2.isdigit():
-        a = int(num1)
-        b = int(num2)
+    if num.isdigit() and den.isdigit():
+        a = int(num)
+        b = int(den)
         res = a * b
 
         return render(request, "result.html", {"result": res})
@@ -257,13 +254,13 @@ def multiplication(request):
 
 def division(request):
 
-    num1 = request.POST['num1']
-    num2 = request.POST['num2']
+    num = request.POST['num']
+    den = request.POST['den']
 
     
-    if num1.isdigit() and num2.isdigit():
-        a = int(num1)
-        b = int(num2)
+    if num.isdigit() and den.isdigit():
+        a = int(num)
+        b = int(den)
 
         if b == 0:
             res = "Zero divide error"

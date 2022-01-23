@@ -10,29 +10,23 @@
             
             <div class="mt-5">
                 <div class="row">
-                    <h3 class="w-100 text-center">Sistema</h3>
+                    <h3 class="w-100 text-center" >Coeficientes do sistema dinâmico</h3>
                 </div>
-        
+                {{system}}
+<!--                 
                 <div class="form-group row">
                     <label for="ampdg">Amplitude: </label>
                     <input type="text" class="form-control" id="ampdg" name="ampdg"><br><br>
                 </div>
-            </div>
-            
-            <div class="mt-5">
-                <div class="row">
-                    <h3 class="w-100 text-center" >Coeficientes do sistema dinâmico</h3>
-                </div>
-        
                 <div class="form-group row">
-                    <label for="num1">Numerador </label>
-                    <input type="text" class="form-control" name="num1" id="num1"><br><br>
+                    <label for="num">Numerador </label>
+                    <input type="text" class="form-control" name="num" id="num"><br><br>
                 </div>
                 
                 <div class="form-group row">
-                    <label for="num2">Denominador</label>
-                    <input type="text" class="form-control" name="num2" id="num2"><br><br>
-                </div>
+                    <label for="den">Denominador</label>
+                    <input type="text" class="form-control" name="den" id="den"><br><br>
+                </div> -->
             </div>
         
         
@@ -42,8 +36,10 @@
                 <div class="row">
                     <h3 class="w-100 text-center">Coeficientes do Compensador (Atraso, Avanço e Atraso e Avanço)</h3>
                 </div>
+
+                {{compensator}}
         
-                <div class="form-group row">
+                <!-- <div class="form-group row">
                     <label for="numcomp"> Numerador </label>
                     <input id="numcomp" class="form-control" type="text" name="numcomp">
                 </div>
@@ -51,7 +47,7 @@
                 <div class="form-group row">
                     <label for="dencomp"> Denominador </label>
                     <input id="dencomp" class="form-control" type="text" name="dencomp">
-                </div>
+                </div> -->
             </div>
         
             <div class="mt-5">
@@ -59,7 +55,7 @@
                     <h3 class="w-100 text-center" >Coeficientes do Controlador PID</h3>
                 </div>
                 
-                <div class="form-group row">
+                <!-- <div class="form-group row">
                     <label for="kp">Ganho Proporcional</label>
                     <input id="kp" class="form-control" type="text" name="kp">
                 </div>
@@ -72,7 +68,9 @@
                 <div class="form-group row">
                     <label class="col-form-label" for="kd">Ganho Derivativo</label>
                     <input id="kd" class="form-control" type="text" name="kd">
-                </div>
+                </div> -->
+
+                {{pid}}
             </div>
             
             <div class="row mt-5">
