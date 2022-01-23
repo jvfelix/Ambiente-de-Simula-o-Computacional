@@ -7,7 +7,21 @@ import numpy as np
 import control as co
 
 def index(request):
-    return render(request, "input.html")
+    if request.method == 'POST':
+        data = request.POST
+        return render(request, "input.html", result(data))
+    else:
+        data = {}
+        data['exemplo'] = True
+        data['ampdg'] = '1'
+        data['num1'] = '1'
+        data['num2'] = '1 2'
+        data['numcomp'] = '1'
+        data['dencomp'] = '1 0'
+        data['kp'] = ''
+        data['ki'] = ''
+        data['kd'] = ''
+        return render(request, "input.html", result(data))
 
 def get_pzmap(G):    
     plt.clf()
@@ -49,16 +63,21 @@ def get_lgr(G, subtitle=''):
     url = urllib.parse.quote(string)
     return url
 
-def result(request):
-    kinho = True
-    degrau = request.POST['ampdg']
-    num1 = request.POST['num1']
-    num2 = request.POST['num2']
-    numcomp = request.POST['numcomp']
-    dencomp = request.POST['dencomp']
-    kp = request.POST['kp']
-    ki = request.POST['ki']
-    kd = request.POST['kd']
+def result(data):
+    exemplo = False
+    try:
+        exemplo = data['exemplo'] 
+    except:
+        pass
+
+    degrau = data['ampdg']
+    num1 = data['num1']
+    num2 = data['num2']
+    numcomp = data['numcomp']
+    dencomp = data['dencomp']
+    kp = data['kp']
+    ki = data['ki']
+    kd = data['kd']
     
     if kp.isdigit():
         kp = float(kp)
@@ -183,25 +202,23 @@ def result(request):
 
         comp = gp + gi + gd
     
-    if kinho == 1:
-        #a = int(num1)
-        #b = int(num2)
-        res = co.tf(num,den)
-        res = co.feedback(res,1,1)
-        Gpid = ampdegrau*res*comp
-        G = co.feedback(Gpid,1,-1)
-        return render(request, "result.html", 
-                {
-                    'step_response':get_step_response(res),
-                    'step_response_comp':get_step_response(G),
-                    'lgr':get_lgr(res),
-                    'lgr_comp':get_lgr(G),
-                    'pzmap':get_pzmap(res),
-                    'pzmap_comp':get_pzmap(G),
-                    'System':res.__str__(),
-                    'SystemComp':G.__str__(),
-                    'Comp':comp.__str__(),
-                })
+    res = co.tf(num,den)
+    res = co.feedback(res,1,1)
+    Gpid = ampdegrau*res*comp
+    G = co.feedback(Gpid,1,-1)
+
+    return  {
+                'type': ('exemplo' if exemplo else 'Resultado'),
+                'step_response':get_step_response(res, res.__str__()),
+                'step_response_comp':get_step_response(G, G.__str__()),
+                'lgr':get_lgr(res),
+                'lgr_comp':get_lgr(G),
+                'pzmap':get_pzmap(res),
+                'pzmap_comp':get_pzmap(G),
+                'System':res.__str__(),
+                'SystemComp':G.__str__(),
+                'Comp':comp.__str__(),
+            }
         
 
 
