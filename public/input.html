@@ -2,9 +2,22 @@
 
 {% block content %}
 
+<style>
+    input {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+    }
+    
+    img {
+        width: 100%;
+    }
+</style>
+
 <div class="row">
     <div class="col-6">
-        <h3>Formulário</h3>
+        <h1 class="text-center">Formulário</h1>
         <form action="" method="POST">
             {% csrf_token %}
             
@@ -13,93 +26,72 @@
                     <h3 class="w-100 text-center" >Coeficientes do sistema dinâmico</h3>
                 </div>
                 {{system}}
-<!--                 
-                <div class="form-group row">
-                    <label for="ampdg">Amplitude: </label>
-                    <input type="text" class="form-control" id="ampdg" name="ampdg"><br><br>
-                </div>
-                <div class="form-group row">
-                    <label for="num">Numerador </label>
-                    <input type="text" class="form-control" name="num" id="num"><br><br>
-                </div>
-                
-                <div class="form-group row">
-                    <label for="den">Denominador</label>
-                    <input type="text" class="form-control" name="den" id="den"><br><br>
-                </div> -->
-            </div>
-        
-        
-        
+            </div>        
         
             <div class="mt-5">
                 <div class="row">
                     <h3 class="w-100 text-center">Coeficientes do Compensador (Atraso, Avanço e Atraso e Avanço)</h3>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="comp_enabler" id="comp_enabler" value="on" checked>
+                    </div>
                 </div>
 
                 {{compensator}}
         
-                <!-- <div class="form-group row">
-                    <label for="numcomp"> Numerador </label>
-                    <input id="numcomp" class="form-control" type="text" name="numcomp">
-                </div>
-        
-                <div class="form-group row">
-                    <label for="dencomp"> Denominador </label>
-                    <input id="dencomp" class="form-control" type="text" name="dencomp">
-                </div> -->
             </div>
         
             <div class="mt-5">
                 <div class="row">
-                    <h3 class="w-100 text-center" >Coeficientes do Controlador PID</h3>
+                    <h3 class="text-center" >Coeficientes do Controlador PID</h3>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="pid_enabler" id="pid_enabler" value="on">
+                    </div>
+                    {{pid}}
                 </div>
-                
-                <!-- <div class="form-group row">
-                    <label for="kp">Ganho Proporcional</label>
-                    <input id="kp" class="form-control" type="text" name="kp">
-                </div>
-        
-                <div class="form-group row">
-                    <label class="col-form-label" for="ki">Ganho Integral</label>
-                    <input id="ki" class="form-control" type="text" name="ki">
-                </div>
-                
-                <div class="form-group row">
-                    <label class="col-form-label" for="kd">Ganho Derivativo</label>
-                    <input id="kd" class="form-control" type="text" name="kd">
-                </div> -->
-
-                {{pid}}
             </div>
             
             <div class="row mt-5">
                 <input class="btn btn-primary" type="submit">
             </div>
-            
         </form>
     </div>
 
     <div class="col-6">
+        <div class="d-flex flex-column justify-content-center">
+            <h1 class="text-center">{{ type }}</h1>
 
-        <h3>{{ type }}</h3>
-
-        <!-- <label>Função de transferência do sistema sem Compensador:</labe>
-        <pre>
-            {{System}}
-        </pre> -->
-        <img src='data:image/png;base64,{{ step_response }}'>
-        <img src='data:image/png;base64,{{ pzmap }}'>
-
-        <!-- <label>Função de transferência do sistema com Compensador:</label>
-        <pre>{{SystemComp}}</pre> -->
-        <!-- 
-        <label>Função de transferência do Compensador:</label>
-        <pre>{{Comp}}</pre> -->
-
-        <img src='data:image/png;base64,{{ step_response_comp }}'>
-        <img src='data:image/png;base64,{{ pzmap_comp }}'>
+            <img src='data:image/png;base64,{{ step_response }}'>
+            <img src='data:image/png;base64,{{ pzmap }}'>
+            <img src="data:image/png;base64,{{ lgr }}">
+            <img src='data:image/png;base64,{{ step_response_comp }}'>
+            <img src='data:image/png;base64,{{ pzmap_comp }}'>
+            <img src="data:image/png;base64,{{ lgr_comp }}">
+        </div>
     </div>
+
+    <script>
+        let pid_enabler = document.getElementById('pid_enabler');
+        let comp_enabler = document.getElementById('comp_enabler');
+        let pid = [document.getElementById('id_kp'), document.getElementById('id_ki'), document.getElementById('id_kd')];
+        let comp = [document.getElementById('id_dencomp'), document.getElementById('id_numcomp')];
+    
+        pid_enabler.onclick = function(){
+            
+            for(let it of pid){
+                it.disabled = !pid_enabler.checked;
+                it.required = pid_enabler.checked;
+            }
+        
+        }
+
+        comp_enabler.onclick = function(){
+
+            for(let it of comp){
+                it.disabled = !comp_enabler.checked;
+                it.required = comp_enabler.checked;
+            }
+        }
+    </script>
 </div>
 
 {%endblock%}

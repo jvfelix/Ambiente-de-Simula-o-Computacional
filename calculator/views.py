@@ -8,11 +8,7 @@ import control as co
 
 def index(request):
     if request.method == 'POST':
-        system = SystemForm(request.POST)
-        compensator = CompensatorForm(request.POST)
-        pid = PIDForm(request.POST)
-        return render(request, "input.html", result(system, compensator, pid))
-
+        return render(request, "input.html", result(request.POST))
     else:
         data = {}
         data['exemplo'] = True
@@ -21,14 +17,11 @@ def index(request):
         data['den'] = '1 2'
         data['numcomp'] = '1'
         data['dencomp'] = '1 0'
-        data['kp'] = ''
-        data['ki'] = ''
-        data['kd'] = ''
-        return render(request, "input.html", result(SystemForm(data), CompensatorForm(data), PIDForm(data), True))
+        return render(request, "input.html", result(data, True))
 
 def get_pzmap(G):    
     plt.clf()
-    plt.figure(figsize=(7, 7), dpi=100)
+    plt.figure(figsize=(5, 5), dpi=100)
     co.pzmap(G, True, True)
     fig = plt.gcf()
     buf = io.BytesIO()
@@ -40,7 +33,7 @@ def get_pzmap(G):
 
 def get_step_response(G, subtitle=''):
     plt.clf()
-    plt.figure(figsize=(7, 7), dpi=100)
+    plt.figure(figsize=(5, 5), dpi=100)
     X, Y = co.step_response(G)
     plt.plot(X, Y, label = subtitle)
     plt.grid()
@@ -55,7 +48,7 @@ def get_step_response(G, subtitle=''):
 
 def get_lgr(G, subtitle=''):
     plt.clf()
-    plt.figure(figsize=(7, 7), dpi=100)
+    plt.figure(figsize=(5, 5), dpi=100)
     co.root_locus(G, plot = True)
     fig = plt.gcf()
     buf = io.BytesIO()
@@ -65,20 +58,26 @@ def get_lgr(G, subtitle=''):
     url = urllib.parse.quote(string)
     return url
 
-def result(system, compensator, pid, exemplo = False):
-    
+def result(data, exemplo = False):
+    system = SystemForm(data)
+    compensator = CompensatorForm(data)
+    pid = PIDForm(data)
+
     if system.is_valid():
         system_data = system.cleaned_data
         ampdegrau = system_data['ampdg']
         num = system_data['num']
         den = system_data['den']
 
-    if compensator.is_valid():
+    if 'comp_enabled' in data and compensator.is_valid():
         compensator_data = compensator.cleaned_data
         numcomp = compensator_data['numcomp']
         dencomp = compensator_data['dencomp']
+    else:
+        numcomp = '1'
+        dencomp = '1'
 
-    if pid.is_valid():
+    if 'pid_enabler' in data and pid.is_valid():
         pid_data = pid.cleaned_data
         kp = pid_data['kp']
         ki = pid_data['ki']
@@ -196,13 +195,13 @@ def result(system, compensator, pid, exemplo = False):
     
     res = co.tf(num,den)
     print(res)
-    res = co.feedback(res,1,1)
-    print(res)
-    Gpid = ampdegrau*res*comp
+    res_ = co.feedback(res,1,-1)
+    print(res_)
+    Gpid = ampdegrau*res_*comp
     G = co.feedback(Gpid,1,-1)
 
     return  {
-                'type': ('exemplo' if exemplo else 'Resultado'),
+                'type': ('Exemplo' if exemplo else 'Resultado'),
                 'step_response':get_step_response(res, res.__str__()),
                 'step_response_comp':get_step_response(G, G.__str__()),
                 'lgr':get_lgr(res),

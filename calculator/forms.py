@@ -10,7 +10,7 @@ class CompensatorForm(forms.Form):
     dencomp = forms.CharField(label='Denominador', max_length=100, required=True)
 
 class PIDForm(forms.Form):
-    kp = forms.FloatField(label='Ganho Proporcional', required=True)
-    ki = forms.FloatField(label='Ganho Integral', required=True)
-    kd = forms.FloatField(label='Ganho Derivativo', required=True)
+    kp = forms.FloatField(label='Ganho Proporcional', required=False, disabled=True)
+    ki = forms.FloatField(label='Ganho Integral', required=False, disabled=True)
+    kd = forms.FloatField(label='Ganho Derivativo', required=False, disabled=True)
 
