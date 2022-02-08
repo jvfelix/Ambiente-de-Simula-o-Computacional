@@ -69,20 +69,21 @@ def result(data, exemplo = False):
         num = system_data['num']
         den = system_data['den']
 
-    if 'comp_enabled' in data and compensator.is_valid():
+    if compensator.is_valid():
         compensator_data = compensator.cleaned_data
         numcomp = compensator_data['numcomp']
         dencomp = compensator_data['dencomp']
     else:
-        numcomp = '1'
-        dencomp = '1'
+        print('sucess')
 
     if 'pid_enabler' in data and pid.is_valid():
         pid_data = pid.cleaned_data
         kp = pid_data['kp']
         ki = pid_data['ki']
         kd = pid_data['kd']
+        print('kinho 1')
     else:
+        print('kinho 2')
         ki = 0
         kp = 0
         kd = 0
@@ -175,11 +176,15 @@ def result(data, exemplo = False):
     for i in texto2:
         linha = linha + "-"
     #######################################################
-    if kp == 0 and ki ==0 and kd == 0:
+    if kp == 0 and ki == 0 and kd == 0:
         comp = co.tf(numcp,dencp)
+        print(numcp)
+        print(num)
+        print(comp)
     else:
         #proporcional
-        nump = [kp]
+        nkp = float(kp)
+        nump = [nkp]
         denp = [1.0]
         gp = co.tf(nump,denp)
         #integral
@@ -197,12 +202,12 @@ def result(data, exemplo = False):
     print(res)
     res_ = co.feedback(res,1,-1)
     print(res_)
-    Gpid = ampdegrau*res_*comp
+    Gpid = ampdegrau*res*comp
     G = co.feedback(Gpid,1,-1)
 
     return  {
                 'type': ('Exemplo' if exemplo else 'Resultado'),
-                'step_response':get_step_response(res, res.__str__()),
+                'step_response':get_step_response(res_, res_.__str__()),
                 'step_response_comp':get_step_response(G, G.__str__()),
                 'lgr':get_lgr(res),
                 'lgr_comp':get_lgr(G),
